@@ -7,7 +7,7 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.0');
-  
+
   api.use([
     'underscore',
     'tracker',
@@ -16,18 +16,20 @@ Package.onUse(function(api) {
     'blaze',
     'session',
     'ejson',
-    'localstorage'
+    'localstorage',
+    'less'
   ], 'client');
-  
+
   api.use('aldeed:autoform@5.0.0', 'client');
-  
+
   api.addFiles([
     'wizard.html',
     'wizard.js',
     'router.js',
-    'cache.js'
+    'cache.js',
+    'wizard.less'
   ], 'client');
-  
+
   if (api.export)
     api.export('Wizard', 'client');
 });

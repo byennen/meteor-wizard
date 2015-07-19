@@ -8,8 +8,16 @@
 </template>
 
 <template name="__wizard_steps">
-  <div class="steps">
-    <ol>
+  <div class="steps row">
+    <div class="col s12">
+      <!-- progressbar -->
+      <ul id="progressbar">
+        <li class="active">Customer Information</li>
+        <li>Banking Information</li>
+        <li>Equipment Selection</li>
+      </ul>
+    </div>
+    <!-- <ol>
     {{#each wizard.steps}}
       <li class="{{activeStepClass id}}">
         {{#if pathForStep id}}
@@ -19,7 +27,7 @@
         {{/if}}
         </li>
     {{/each}}
-    </ol>
+    </ol> -->
   </div>
 </template>
 
@@ -40,14 +48,14 @@
 <template name="wizardButtons">
   {{#with wizard}}
     <div class="wizard-nav row">
-      <div id="col s12">
+      <div id="col s6">
         {{#if showBackButton}}
         <button type="button" class="wizard-back-button waves-effect waves-light btn grey {{buttonClasses}}">{{backButton}}</button>
         {{/if}}
         {{#if isLastStep}}
-        <button type="submit" class="wizard-submit-buttonwaves-effect waves-light btn {{buttonClasses}}">{{confirmButton}}</button>
+        <button type="submit" class="wizard-submit-buttonwaves-effect waves-light btn blue {{buttonClasses}}">{{confirmButton}}</button>
         {{else}}
-        <button type="submit" class="wizard-next-button waves-effect waves-light btn {{buttonClasses}}">{{nextButton}}</button>
+        <button type="submit" class="wizard-next-button waves-effect waves-light btn blue {{buttonClasses}}">{{nextButton}}</button>
         {{/if}}
       </div>
     </div>
