@@ -49,13 +49,13 @@
   {{#with wizard}}
     <div class="wizard-nav row">
       <div id="col s6">
-        {{#if showBackButton}}
-        <button type="button" class="wizard-back-button waves-effect waves-light btn grey {{buttonClasses}}">{{backButton}}</button>
-        {{/if}}
         {{#if isLastStep}}
-        <button type="submit" class="wizard-submit-buttonwaves-effect waves-light btn blue {{buttonClasses}}">{{confirmButton}}</button>
+          <button type="submit" class="wizard-submit-buttonwaves-effect waves-light btn blue right {{buttonClasses}}">{{confirmButton}}</button>
         {{else}}
-        <button type="submit" class="wizard-next-button waves-effect waves-light btn blue {{buttonClasses}}">{{nextButton}}</button>
+          <button type="submit" class="wizard-next-button waves-effect waves-light btn blue right {{buttonClasses}}">{{nextButton}}</button>
+        {{/if}}
+        {{#if showBackButton}}
+          <button type="button" class="wizard-back-button waves-effect waves-light btn grey right {{buttonClasses}}">{{backButton}}</button>
         {{/if}}
       </div>
     </div>
