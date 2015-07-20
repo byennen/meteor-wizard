@@ -36,9 +36,13 @@
   {{#if destroyForm}}
   {{else}}
     {{#autoForm id=step.formId doc=step.data schema=step.schema}}
-      {{#each afFieldNames}}
-        {{> afQuickField name=this.name options=afOptionsFromSchema}}
-      {{/each}}
+      <div class="card-panel autoform-object-field">
+        <div class="card-content">
+          {{#each afFieldNames}}
+            {{> afQuickField name=this.name options=afOptionsFromSchema}}
+          {{/each}}
+        </div>
+      </div>
       {{> wizardButtons}}
     {{/autoForm}}
   {{/if}}
