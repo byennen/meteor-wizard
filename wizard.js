@@ -14,13 +14,16 @@ Template.registerHelper('pathForStep', function(id) {
   } if (!this.wizard.route) {
     return '#' + id;
   }
-  
+
   return WizardRouter.path(this.wizard.route, id);
 });
 
 Template.wizard.created = function() {
   var id = this.data.id || defaultId;
   this.wizard = wizardsById[id] = new WizardConstructor(this.data);
+
+  if(Session.get('activeStepId'))
+    this.wizard.show(Session.get('activeStepId'));
 };
 
 Template.wizard.destroyed = function() {
@@ -58,7 +61,7 @@ Template.__wizard_steps.events({
 });
 
 Template.__wizard_steps.helpers({
-  activeStepClass: function(id) { 
+  activeStepClass: function(id) {
     var activeStep = this.wizard.activeStep();
     return (activeStep && activeStep.id == id) && 'active' || '';
   }
@@ -67,14 +70,14 @@ Template.__wizard_steps.helpers({
 // Temporary fix because AutoForm doesnt support reactive schema's
 Template.__wizard_step.created = function() {
   var self = this;
-  
+
   this.destroyForm = new ReactiveVar(false);
-  
+
   this.autorun(function() {
     var data = Blaze.getData();
     self.destroyForm.set(true);
   });
-  
+
   this.autorun(function () {
     if (self.destroyForm.get()) {
       self.destroyForm.set(false);
@@ -103,7 +106,7 @@ Template.wizardButtons.helpers({
 
 var WizardConstructor = function(options) {
   this._dep = new Tracker.Dependency();
-  
+
   options = _.chain(options).pick(
     'id',
     'route',
@@ -122,26 +125,26 @@ var WizardConstructor = function(options) {
     confirmButton: 'Confirm',
     persist: true
   }).value();
-  
+
   _.extend(this, options);
-  
+
   this._stepsByIndex = [];
   this._stepsById = {};
-  
+
   this.store = new CacheStore(this.id, {
     persist: this.persist !== false
   });
-  
+
   this.initialize();
 };
 
 WizardConstructor.prototype = {
-  
+
   constructor: WizardConstructor,
 
   initialize: function() {
     var self = this;
-    
+
     _.each(this.steps, function(step) {
       self._initStep(step);
     });
@@ -157,15 +160,15 @@ WizardConstructor.prototype = {
 
   _initStep: function(step) {
     var self = this;
-    
+
     if (!step.id) {
       throw new Meteor.Error('step-id-required', 'Step.id is required');
     }
-    
+
     if (!step.formId) {
       step.formId = step.id + '-form';
     }
-    
+
     this._stepsByIndex.push(step.id);
     this._stepsById[step.id] = _.extend(step, {
       wizard: self,
@@ -177,7 +180,7 @@ WizardConstructor.prototype = {
     AutoForm.addHooks(step.formId, {
       onSubmit: function(data) {
         this.event.preventDefault();
-        
+
         if(step.onSubmit) {
           step.onSubmit.call(this, data, self);
         } else {
@@ -186,7 +189,7 @@ WizardConstructor.prototype = {
       }
     }, true);
   },
-  
+
   _setActiveStep: function(step) {
     // show the first step if not bound to a route
     if(!step) {
@@ -200,7 +203,7 @@ WizardConstructor.prototype = {
     if(index === -1) {
       return this.setStep(0);
     }
-    
+
     // invalid step
     if(index > 0 && previousStep && !previousStep.data()) {
       return this.setStep(0);
@@ -209,15 +212,15 @@ WizardConstructor.prototype = {
     // valid
     this.setStep(step);
   },
-  
+
   setData: function(id, data) {
     this.store.set(id, data);
   },
-  
+
   clearData: function() {
     this.store.clear();
   },
-  
+
   mergedData: function() {
     var data = {};
     _.each(this._stepsById, function(step) {
@@ -225,15 +228,15 @@ WizardConstructor.prototype = {
     });
     return data;
   },
-  
+
   next: function(data) {
     var activeIndex = _.indexOf(this._stepsByIndex, this._activeStepId);
-    
+
     this.setData(this._activeStepId, data);
 
     this.show(activeIndex + 1);
   },
-  
+
   previous: function() {
     var activeIndex = _.indexOf(this._stepsByIndex, this._activeStepId);
 
@@ -241,7 +244,7 @@ WizardConstructor.prototype = {
 
     this.show(activeIndex - 1);
   },
-  
+
   show: function(id) {
     if(typeof id === 'number') {
       id = id in this._stepsByIndex && this._stepsByIndex[id];
@@ -257,55 +260,55 @@ WizardConstructor.prototype = {
 
     return true;
   },
-  
+
   getStep: function(id) {
     if(typeof id === 'number') {
       id = id in this._stepsByIndex && this._stepsByIndex[id];
     }
-    
+
     return id in this._stepsById && this._stepsById[id];
   },
-  
+
   activeStep: function(reactive) {
     if(reactive !== false) {
       this._dep.depend();
     }
     return this._stepsById[this._activeStepId];
   },
-  
+
   setStep: function(id) {
     if(typeof id === 'number') {
       id = id in this._stepsByIndex && this._stepsByIndex[id];
     }
 
     if(!id) return false;
-    
+
     this._activeStepId = id;
     this._dep.changed();
     return this._stepsById[this._activeStepId];
   },
-  
+
   isActiveStep: function(id) {
     return id === this._activeStepId;
   },
-  
+
   isFirstStep: function(id) {
     id = id || this._activeStepId;
     return this.indexOf(id) === 0;
   },
-  
+
   isLastStep: function(id) {
     id = id || this._activeStepId;
     return this.indexOf(id) === this._stepsByIndex.length - 1;
   },
-  
+
   indexOf: function(id) {
     return _.indexOf(this._stepsByIndex, id);
   },
-  
+
   destroy: function() {
     this._comp.stop();
-    
+
     if(this.clearOnDestroy) this.clearData();
-  } 
+  }
 };
